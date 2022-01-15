@@ -39,7 +39,7 @@ export class InternalModuleManager extends ModuleManagerProxy {
      * Notifies the modules that contain a cleanup method to remove
      */
     async cleanup() {
-        for (const module of this._cache.values())
+        for (const module of this.#cache.values())
             if (typeof module.cleanup == 'function') await module.cleanup();
     }
 
@@ -59,9 +59,9 @@ export class InternalModuleManager extends ModuleManagerProxy {
      * @returns {Map} The map holding the modules
      */
     getScope(scopeName, create = false) {
-        if (!this.#scop.has(scopeName) && create)
-            this.#scop.set(scopeName, new Map());
-        return this.#scop.get(scopeName);
+        if (!this.#scope.has(scopeName) && create)
+            this.#scope.set(scopeName, new Map());
+        return this.#scope.get(scopeName);
     }
 
     /**
@@ -111,7 +111,7 @@ export class InternalModuleManager extends ModuleManagerProxy {
                     this.#cache.get(_event.mod)?.on(_event.name, mod[_event.call].bind(mod));
         }
 
-        for (const mod of this._cache.values())
+        for (const mod of this.#cache.values())
             if (typeof mod.init === 'function' && !await mod.init())
                 throw new Error(`MODULES | Module "${mod.info.name} failed to initialise."`);
     }
@@ -124,7 +124,7 @@ export class InternalModuleManager extends ModuleManagerProxy {
                     continue;
                 
                 if (this.has(ModuleInfo.name))
-                    throw new Error(`MODULES | Duplicate module name error: "${instance.name}"`);
+                    throw new Error(`MODULES | Duplicate module name error: "${ModuleInfo.name}"`);
 
                 const instance = new ModuleInstance(main);
 
