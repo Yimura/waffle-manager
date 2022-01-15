@@ -24,13 +24,13 @@ export class InternalModuleManager extends ModuleManagerProxy {
      * @param {Object} instance The instance to register
      */
     addScoped(instance) {
-        const { group, name } = instance.scope;
+        const { group, name } = instance.info.scope;
         if (!group || !name)
             throw new Error(`MODULES | Scoped module registered with either scope name not set or the module it's scoped name not set.`);
 
         const scope = this.getScope(group, true);
         if (scope.has(name))
-            throw new Error(`MODULES | Duplicate scoped module name error, module "${instance.name}" is trying to register "${name}" to scope "${group}"`);
+            throw new Error(`MODULES | Duplicate scoped module name error, module "${instance.info.name}" is trying to register "${name}" to scope "${group}"`);
 
         scope.set(name, instance);
     }
@@ -49,7 +49,7 @@ export class InternalModuleManager extends ModuleManagerProxy {
      * @returns The module instance
      */
     get(moduleName) {
-        return this._cache.get(moduleName);
+        return this.#cache.get(moduleName);
     }
 
     /**
@@ -59,9 +59,9 @@ export class InternalModuleManager extends ModuleManagerProxy {
      * @returns {Map} The map holding the modules
      */
     getScope(scopeName, create = false) {
-        if (!this._scope.has(scopeName) && create)
-            this._scope.set(scopeName, new Map());
-        return this._scope.get(scopeName);
+        if (!this.#scop.has(scopeName) && create)
+            this.#scop.set(scopeName, new Map());
+        return this.#scop.get(scopeName);
     }
 
     /**
@@ -80,7 +80,7 @@ export class InternalModuleManager extends ModuleManagerProxy {
      * @returns {boolean} True if it exists, false if not
      */
     has(moduleName) {
-        return this._cache.has(moduleName);
+        return this.#cache.has(moduleName);
     }
 
     /**
@@ -100,35 +100,20 @@ export class InternalModuleManager extends ModuleManagerProxy {
      * @param {Object} main The main instance of your program to pass to all the modules
      */
     async #initModules(main) {
-        for (const [ name, instance ] of this._cache) {
-            if (instance.requires) {
-                for (const requirement of instance.requires) {
-                    if (!this.has(requirement)) {
+        for (const [ name, mod ] of this.#cache) {
+            if (mod.info.requires)
+                for (const requirement of mod.info.requires)
+                    if (!this.has(requirement))
                         throw new Error(`MODULES | Module "${name}" has an unmet requirement "${requirement}"`);
-                    }
-                }
-            }
 
-            if (instance.events) {
-                for (const _event of instance.events) {
-                    if (_event.mod) {
-                        const mod = this._cache.get(_event.mod);
-                        if (mod) {
-                            mod.on(_event.name, instance[_event.call].bind(instance));
-
-                            continue;
-                        }
-                    }
-
-                    if (typeof main.on === 'function') main.on(_event.name, instance[_event.call].bind(instance));
-                }
-            }
+            if (mod.info.events)
+                for (const _event of mod.info.events)
+                    this.#cache.get(_event.mod)?.on(_event.name, mod[_event.call].bind(mod));
         }
 
-        for (const instance of this._cache.values()) {
-            if (typeof instance.init === 'function' && !await instance.init())
-                throw new Error(`MODULES | Module "${instance.name} failed to initialise."`);
-        }
+        for (const mod of this._cache.values())
+            if (typeof mod.init === 'function' && !await mod.init())
+                throw new Error(`MODULES | Module "${mod.info.name} failed to initialise."`);
     }
 
     async #registerModules(main, modules, parentName = 'root') {
@@ -151,6 +136,8 @@ export class InternalModuleManager extends ModuleManagerProxy {
                 });
                 this.#cache.set(ModuleInfo.name, moduleProxy);
                 
+                if (ModuleInfo.scope)
+                    this.addScoped(moduleProxy);
 
                 continue;
             }
