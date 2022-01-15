@@ -1,0 +1,28 @@
+{
+  "name": "waffle-manager",
+  "version": "0.1.0",
+  "description": "Global registration of \"modules\", access singleton instances from anywhere.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Yimura/waffle-manager.git"
+  },
+  "keywords": [
+    "modules",
+    "manager",
+    "singleton"
+  ],
+  "author": "yimura",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Yimura/waffle-manager/issues"
+  },
+  "homepage": "https://github.com/Yimura/waffle-manager#readme",
+  "dependencies": {
+    "@yimura/import-dir": "^0.1.12"
+  }
+}
