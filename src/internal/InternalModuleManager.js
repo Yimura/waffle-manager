@@ -1,5 +1,5 @@
-import { ModuleManagerProxy } from "./ModuleManagerProxy";
-import { ModuleProxy } from "./ModuleProxy";
+import { ModuleManagerProxy } from "./ModuleManagerProxy.js";
+import { ModuleProxy } from "./ModuleProxy.js";
 
 export class InternalModuleManager extends ModuleManagerProxy {
     /**
