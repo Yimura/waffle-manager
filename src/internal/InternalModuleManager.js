@@ -1,3 +1,4 @@
+import ImportDir from '@yimura/import-dir';
 import { ModuleManagerProxy } from "./ModuleManagerProxy.js";
 import { ModuleProxy } from "./ModuleProxy.js";
 
