@@ -5,7 +5,7 @@
  */
 const get = (target, prop, receiver) => {
     if (typeof target[prop] === 'undefined') target.get(prop);
-    return Reflect.get(...arguments);
+    return Reflect.get(target, prop, receiver);
 }
  
 export class ModuleManagerProxy {
