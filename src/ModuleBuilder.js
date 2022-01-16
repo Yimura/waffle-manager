@@ -13,7 +13,7 @@
  * @property {string} name - The name of this module
  * @property {string[]} required - Module names that are required for this module to function
  */
-class ModuleBuilder extends Base {
+class ModuleBuilder {
     /**
      * @param {string} name The name of this module
      */
