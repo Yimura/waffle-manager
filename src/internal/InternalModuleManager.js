@@ -8,13 +8,13 @@ export class InternalModuleManager extends ModuleManagerProxy {
      * @private
      * @type {Map}
      */
-    #cache = new Map();
+    _cache = new Map();
     /**
      * A map with scope name as key and another map with the instances of those scoped modules
      * @private
      * @type {Map}
      */
-    #scope = new Map();
+    _scope = new Map();
 
     constructor() {
         super();
@@ -40,7 +40,7 @@ export class InternalModuleManager extends ModuleManagerProxy {
      * Notifies the modules that contain a cleanup method to remove
      */
     async cleanup() {
-        for (const module of this.#cache.values())
+        for (const module of this._cache.values())
             if (typeof module.cleanup == 'function') await module.cleanup();
     }
 
@@ -50,7 +50,7 @@ export class InternalModuleManager extends ModuleManagerProxy {
      * @returns The module instance
      */
     get(moduleName) {
-        return this.#cache.get(moduleName);
+        return this._cache.get(moduleName);
     }
 
     /**
@@ -60,9 +60,9 @@ export class InternalModuleManager extends ModuleManagerProxy {
      * @returns {Map} The map holding the modules
      */
     getScope(scopeName, create = false) {
-        if (!this.#scope.has(scopeName) && create)
-            this.#scope.set(scopeName, new Map());
-        return this.#scope.get(scopeName);
+        if (!this._scope.has(scopeName) && create)
+            this._scope.set(scopeName, new Map());
+        return this._scope.get(scopeName);
     }
 
     /**
@@ -81,7 +81,7 @@ export class InternalModuleManager extends ModuleManagerProxy {
      * @returns {boolean} True if it exists, false if not
      */
     has(moduleName) {
-        return this.#cache.has(moduleName);
+        return this._cache.has(moduleName);
     }
 
     /**
@@ -91,7 +91,7 @@ export class InternalModuleManager extends ModuleManagerProxy {
      */
     async load(main, path) {
         const modules = ImportDir(path, { recurse: true, recurseDepth: 1 });
-        
+
         await this.#registerModules(main, modules);
         await this.#initModules(main);
     }
@@ -101,7 +101,7 @@ export class InternalModuleManager extends ModuleManagerProxy {
      * @param {Object} main The main instance of your program to pass to all the modules
      */
     async #initModules(main) {
-        for (const [ name, mod ] of this.#cache) {
+        for (const [ name, mod ] of this._cache) {
             if (mod.info.requires)
                 for (const requirement of mod.info.requires)
                     if (!this.has(requirement))
@@ -109,10 +109,10 @@ export class InternalModuleManager extends ModuleManagerProxy {
 
             if (mod.info.events)
                 for (const _event of mod.info.events)
-                    this.#cache.get(_event.mod)?.on(_event.name, mod[_event.call].bind(mod));
+                    this._cache.get(_event.mod)?.on(_event.name, mod[_event.call].bind(mod));
         }
 
-        for (const mod of this.#cache.values())
+        for (const mod of this._cache.values())
             if (typeof mod.init === 'function' && !await mod.init())
                 throw new Error(`MODULES | Module "${mod.info.name} failed to initialise."`);
     }
@@ -123,7 +123,7 @@ export class InternalModuleManager extends ModuleManagerProxy {
                 const { ModuleClasses, ModuleConstants, ModuleInfo, ModuleInstance } = await modules[bit];
                 if (ModuleInfo.disabled)
                     continue;
-                
+
                 if (this.has(ModuleInfo.name))
                     throw new Error(`MODULES | Duplicate module name error: "${ModuleInfo.name}"`);
 
@@ -135,8 +135,8 @@ export class InternalModuleManager extends ModuleManagerProxy {
                     info: ModuleInfo,
                     instance: new ModuleInstance(main)
                 });
-                this.#cache.set(ModuleInfo.name, moduleProxy);
-                
+                this._cache.set(ModuleInfo.name, moduleProxy);
+
                 if (ModuleInfo.scope)
                     this.addScoped(moduleProxy);
 
