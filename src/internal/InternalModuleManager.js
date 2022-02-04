@@ -109,7 +109,7 @@ export class InternalModuleManager extends ModuleManagerProxy {
 
             if (mod.info.events)
                 for (const _event of mod.info.events)
-                    this._cache.get(_event.mod)?.on(_event.name, mod[_event.call].bind(mod));
+                    this._cache.get(_event.module)?.on(_event.name, mod[_event.call].bind(mod));
         }
 
         for (const mod of this._cache.values())
