@@ -1,6 +1,6 @@
 {
   "name": "waffle-manager",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Global registration of \"modules\", access singleton instances from anywhere.",
   "main": "index.js",
   "type": "module",
