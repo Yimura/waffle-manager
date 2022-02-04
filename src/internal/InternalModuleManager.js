@@ -127,8 +127,6 @@ export class InternalModuleManager extends ModuleManagerProxy {
                 if (this.has(ModuleInfo.name))
                     throw new Error(`MODULES | Duplicate module name error: "${ModuleInfo.name}"`);
 
-                const instance = new ModuleInstance(main);
-
                 const moduleProxy = new ModuleProxy({
                     classes: ModuleClasses,
                     constants: ModuleConstants,
