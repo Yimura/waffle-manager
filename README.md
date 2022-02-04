@@ -25,7 +25,7 @@ export const ModuleInfo = new ModuleBuilder('commandHandler')
     .addRequired('client')
     .setScope('internal', 'commandRegistrar');
 
-export default class CommandHandler {
+export const ModuleInstance = class CommandHandler {
     /**
      * @param {object} global_data First argument passed to Modules#load() 
      */
