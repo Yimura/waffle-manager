@@ -120,6 +120,8 @@ export class InternalModuleManager extends ModuleManagerProxy {
     async #registerModules(main, modules, parentName = 'root') {
         for (const bit in modules) {
             if (modules[bit] instanceof Promise) {
+                if (bit !== 'index') continue;
+
                 const { ModuleClasses, ModuleConstants, ModuleInfo, ModuleInstance } = await modules[bit];
                 if (ModuleInfo.disabled)
                     continue;
