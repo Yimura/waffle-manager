@@ -52,10 +52,12 @@ class ModuleBuilder {
 
     /**
      * Marks this module as being disabled preventing it from loading
-     * @param {boolean} toggle 
+     * @param {boolean} toggle
      */
     setDisabled() {
-        this.disable = true;
+        this.disabled = true;
+
+        return this;
     }
 
     /**
